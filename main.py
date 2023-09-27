@@ -1,7 +1,7 @@
 import re
 import long_responses as long
 
-def msgProbability(userMsg, recognizeWord, singleRespo=False, requieredWords=[])
+def msgProbability(userMsg, recognizeWord, singleRespo=False, requiredWord=[]):
     msgCertainty = 0
     hasRequieredWord = True
 
@@ -13,7 +13,7 @@ def msgProbability(userMsg, recognizeWord, singleRespo=False, requieredWords=[])
     #calculate the percentage of recognized words in a user message
     percentage = float(msgCertainty) / float(len(recognizeWord))
 
-    for word in requieredWords:
+    for word in requiredWord:
         if word not in userMsg:
             hasRequieredWord = False
             break
@@ -32,20 +32,21 @@ def checkAllMsg(msg):
 
     #Response -----------------------------------
     response('Hello!', ['hello', 'hi', 'heya', 'heyo'], singleRespo=True)
-    response('Im doing fine, and you?', ['how','are','you',], requiredWord=['how','are','you'])
+    response('Im doing fine, and you?', ['how','are','you',], requiredWord=['how','are'])
+    response('Glad to hear that!', ['im', 'fine', 'too'], requiredWord=['fine', 'too'])
     #response('Thank you!', [])
 
-    bestMatch = max(highestProbList, key=highestProbList.get())
-    print(highestProbList)
+    bestMatch = max(highestProbList, key=highestProbList.get)
+    #print(highestProbList)
 
     return bestMatch
 
-def getResponse(userInput):
-    splitMsg = re.split(r'\s+|[,;?!.-]\s*', userInput.lower())
-    response = checkAllMsg(splitMsg)
+# Used to get the response
+def get_response(user_input):
+    split_message = re.split(r'\s+|[,;?!.-]\s*', user_input.lower())
+    response = checkAllMsg(split_message)
     return response
-
 
 #Testing the response system
 while True:
-    print('Bot: ' + getResponse(input('You: ')))
+    print('Bot: ' + get_response(input('You: ')))
