@@ -1,5 +1,16 @@
 {
-    "questions":[
-        
-    ]
+  "questions": [
+    {
+      "question": "Hello",
+      "answer": "Hi!"
+    },
+    {
+      "question": "Hi",
+      "answer": "Hello"
+    },
+    {
+      "question": "Hello there!",
+      "answer": "General Kenobi"
+    }
+  ]
 }
