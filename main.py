@@ -33,8 +33,12 @@ def checkAllMsg(msg):
     #Response -----------------------------------
     response('Hello!', ['hello', 'hi', 'heya', 'heyo'], singleRespo=True)
     response('Im doing fine, and you?', ['how','are','you',], requiredWord=['how','are'])
+    response('Glad to hear that!', ['im', 'fine', 'too'], requiredWord=['fine'])
     response('Glad to hear that!', ['im', 'fine', 'too'], requiredWord=['fine', 'too'])
-    #response('Thank you!', [])
+    response('Thank you!', ['great'], singleRespo=True)
+    response('Goodbye!', ['thats','it'])
+    response('Goodbye!', ['i','got', 'to', 'go'], requiredWord=['go'])
+    response('Goodbye!', ['goodbye'], requiredWord=['goodbye'])
 
     bestMatch = max(highestProbList, key=highestProbList.get)
     #print(highestProbList)
