@@ -1,56 +1,52 @@
-import re
-import long_responses as long
+import json
+from difflib import get_close_matches
 
-def msgProbability(userMsg, recognizeWord, singleRespo=False, requiredWord=[]):
-    msgCertainty = 0
-    hasRequieredWord = True
+#Load knowledgebase from JSON
 
-    #count how many words are present in each message
-    for word in userMsg:
-        if word in recognizeWord:
-            msgCertainty += 1
+def load_knowledge_base(file_path: str) -> dict:
+    with open(file_path, 'r') as file:
+        data: dict = json.load(file)
+    return data
 
-    #calculate the percentage of recognized words in a user message
-    percentage = float(msgCertainty) / float(len(recognizeWord))
 
-    for word in requiredWord:
-        if word not in userMsg:
-            hasRequieredWord = False
+def save_knowledge_base(file_path: str, data: dict):
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=2)
+
+
+def find_best_match(user_question: str, questions: list[str]) -> str | None:
+    matches: list = get_close_matches(user_question, questions, n=1, cutoff=0.6)
+    return matches[0] if matches else None
+
+
+def get_answer_for_question(question: str, knowledge_base: dict) -> str | None:
+    for q in knowledge_base["questions"]:
+        if q["question"] == question:
+            return q["answer"]
+        
+def chat_bot():
+    knowledge_base : dict = load_knowledge_base('knowledgebase.json')
+
+    while True:
+        user_input: str = input('You: ')
+
+        if user_input.lower() == 'quit':
             break
 
-    if hasRequieredWord or singleRespo:
-        return int(percentage*100)
-    else:
-        return 0
-    
-def checkAllMsg(msg):
-    highestProbList = {}
+        best_match: str | None = find_best_match(user_input, [q["question"] for q in knowledge_base["questions"]])
 
-    def response(botResponse, listOfWord, singleRespo=False, requiredWord=[]):
-        nonlocal highestProbList
-        highestProbList[botResponse] = msgProbability(msg, listOfWord, singleRespo, requiredWord)
+        if best_match:
+            answer : str = get_answer_for_question(best_match, knowledge_base)
+            print(f'Bot: {answer}')
+        else:
+            print('Bot: I don\'t know the answer. Can you teach me?')
+            new_answer: str = input('Type the answer or "skip" to skip: ')
 
-    #Response -----------------------------------
-    response('Hello!', ['hello', 'hi', 'heya', 'heyo'], singleRespo=True)
-    response('Im doing fine, and you?', ['how','are','you',], requiredWord=['how','are'])
-    response('Glad to hear that!', ['im', 'fine', 'too'], requiredWord=['fine'])
-    response('Glad to hear that!', ['im', 'fine', 'too'], requiredWord=['fine', 'too'])
-    response('Thank you!', ['great'], singleRespo=True)
-    response('Goodbye!', ['thats','it'])
-    response('Goodbye!', ['i','got', 'to', 'go'], requiredWord=['go'])
-    response('Goodbye!', ['goodbye'], requiredWord=['goodbye'])
+            if new_answer.lower() != 'skip':
+                knowledge_base["questions"].append({"question": user_input, "answer": new_answer})
+                save_knowledge_base('knowledgebase.json', knowledge_base)
+                print('Bot: Thank you! I learned a new reponse!')
 
-    bestMatch = max(highestProbList, key=highestProbList.get)
-    #print(highestProbList)
 
-    return bestMatch
-
-# Used to get the response
-def get_response(user_input):
-    split_message = re.split(r'\s+|[,;?!.-]\s*', user_input.lower())
-    response = checkAllMsg(split_message)
-    return response
-
-#Testing the response system
-while True:
-    print('Bot: ' + get_response(input('You: ')))
+if __name__ == '__main__':
+    chat_bot()
